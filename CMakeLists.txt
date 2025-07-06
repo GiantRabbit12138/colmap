@@ -30,6 +30,11 @@
 
 cmake_minimum_required(VERSION 3.12)
 
+# vcpkg
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_HOME}/scripts/buildsystems/vcpkg.cmake"
+  CACHE STRING "Vcpkg toolchain file")
+
 ################################################################################
 # Options
 ################################################################################
@@ -86,6 +91,20 @@ set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY GLOBAL_DEPENDS_NO_CYCLES ON)
+
+# MSVC
+if (IS_MSVC)
+  message(STATUS "MSVC detected, setting source and execution charset to UTF-8")
+  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/execution-charset:utf-8>")
+endif()
+
+# build directory
+if (${CMAKE_BUILD_TYPE} STREQUAL Release)
+  SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/Release)
+else()
+  SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+endif()
 
 ################################################################################
 # Include CMake dependencies
